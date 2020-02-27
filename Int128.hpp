@@ -26,7 +26,7 @@ namespace Ns
         inline Int128(unsigned long int value) : lo(value), hi(0) {};
         inline Int128(unsigned long long value) : lo(value), hi(0) {};
         inline Int128(const Int128& value) : lo(value.lo), hi(value.hi) {};
-        inline Int128(const signed long long& high, const unsigned long long& low) : hi(high), lo(low) {};
+        inline Int128(const signed long long& high, const unsigned long long& low) : lo(low), hi(high) {};
 
     private:
         inline Int128(int sign, unsigned int* ints, int intslen);
@@ -60,6 +60,7 @@ namespace Ns
         inline friend Int128                                            operator << (const Int128& value, int shift);
         inline friend Int128                                            operator >> (const Int128& value, int shift);
 
+#if defined(WIN32) || __cplusplus >= 201103L
     public:
         explicit inline                                                 operator bool() const;
         explicit inline                                                 operator signed char() const;
@@ -71,7 +72,8 @@ namespace Ns
         explicit inline                                                 operator unsigned short() const;
         explicit inline                                                 operator unsigned int() const;
         explicit inline                                                 operator unsigned long() const;
-        explicit inline                                                 operator unsigned long long() const;           
+        explicit inline                                                 operator unsigned long long() const;
+#endif
 
     public:
         inline int                                                      Sign();
@@ -383,7 +385,7 @@ namespace Ns
             }
         }
 
-        return Int128(signed long long(shifted[1]), shifted[0]); // lo is stored in array entry 0  
+        return Int128((signed long long)(shifted[1]), shifted[0]); // lo is stored in array entry 0  
     }
 
     inline Int128 operator>>(const Int128& value, int shift)
@@ -440,9 +442,10 @@ namespace Ns
             shifted[i] |= (values[i + 1] << bshift);
         }
 
-        return Int128(signed long long(shifted[1]), shifted[0]); // lo is stored in array entry 0  
+        return Int128((signed long long)(shifted[1]), shifted[0]); // lo is stored in array entry 0  
     }
 
+#if defined(WIN32) || __cplusplus >= 201103L
     inline Int128::operator bool() const
     {
         return lo != 0 || hi != 0;
@@ -497,6 +500,7 @@ namespace Ns
     {
         return (unsigned long long)lo;
     }
+#endif
 
     inline int Int128::Sign()
     {
